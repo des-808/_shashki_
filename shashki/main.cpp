@@ -222,7 +222,7 @@ do {
 	if (tmpY == 32767 || tmpX == 32767) { game = false; }//Если по Y = 32767 и X = 32767 то выход из пролграммы по ESCAPE
 	else {//Продолжаем если не ESCAPE
 		if (old_bool) { //выбор ячейки. если не ESCAPE продолжаем дальше
-			if (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {
+			if (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {//0 - пустая ячейка. 8 - белая ячейка
 				old_shag = 0; new_shag = -1;// если ячейка пустая то ошибка
 //old_bool = false;  
 			}
