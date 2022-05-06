@@ -117,14 +117,23 @@ int chars_bytes[12][6]{
 		{0b00011100, 0b00001000, 0b00001000, 0b00001000, 0b00011000, 0b00000000 }  // Символ 108 <l> 
 };
 
+//int shashki[8][8]{  {8,1,8,1,8,1,8,1},
+//					{1,8,1,8,1,8,1,8},
+//					{8,1,8,1,8,1,8,1},
+//					{0,8,0,8,0,8,0,8},
+//					{8,0,8,0,8,0,8,0},
+//					{2,8,2,8,2,8,2,8},
+//					{8,2,8,2,8,2,8,2},
+//					{2,8,2,8,2,8,2,8} };//стартовая таблица;
 int shashki[8][8]{  {8,1,8,1,8,1,8,1},
 					{1,8,1,8,1,8,1,8},
 					{8,1,8,1,8,1,8,1},
 					{0,8,0,8,0,8,0,8},
-					{8,0,8,0,8,0,8,0},
-					{2,8,2,8,2,8,2,8},
+					{8,2,8,0,8,0,8,0},
+					{2,8,0,8,2,8,2,8},
 					{8,2,8,2,8,2,8,2},
-					{2,8,2,8,2,8,2,8} };//стартовая таблица;
+					{2,8,2,8,3,8,2,8} };//стартовая таблица;
+
 
 char shashki_white[7][14]{ {black,black,black,black,black,black,white,white,black,black,black,black,black,black},
 							{black,black,black,black,white,white,white,white,white,white,black,black,black,black},
@@ -257,23 +266,23 @@ do {
 			if(old_shag == 1||old_shag == 2){//для обычных шашек
 				if (proverka_Y > 1 || proverka_X > 1 || proverka_Y < -1 || proverka_X < -1) {
 					peremeshenie = false;
-					if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||
+					if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||//если шашка сделала ход в какую либо сторону на 2 клетки
 						(proverka_Y == 2 && proverka_X == -2) || (proverka_Y == -2 && proverka_X == -2))
 					{
-						(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;
-						(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;
+						(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+						(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
 
-						if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {
-							shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;
-							peremeshenie = true;
+						if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
+							shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
+							peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
 						}
 					}
-					if (peremeshenie) {
+					if (peremeshenie) {//перемещаем выбранную шашку на новое место
 					shashki[tmpYold][tmpXold] = 0;
 					shashki[tmpY][tmpX] = old_shag;
-					print(output, 0, 68, "                                    "); cout << endl;
+					print(output, 0, 68, "                                              "); cout << endl;
 					}
-					else { print(output, 0, 68, "Error: шашки ходят на одну клетку "); cout << endl; }
+					else { print(output, 0, 68, "Error: шашки могут бить только через клетку  "); cout << endl; }
 				}
 				else {//если шашка просто делает ход проверяем что она не ходит назад
 					peremeshenie = false;//устанавливаем переменныю разрешение в false. если будет правильный ход то переменная поменяется на true
@@ -284,13 +293,30 @@ do {
 						shashki[tmpY][tmpX] = old_shag;
 						print(output, 0, 68, "                                    "); cout << endl;
 					}
-					else { print(output, 0, 68, "Error: шашки не ходят назад "); cout << endl; }//если ход был неправильный. выводим сообщение
+					else { print(output, 0, 68, "Error: шашки не ходят назад                "); cout << endl; }//если ход был неправильный. выводим сообщение
 				}
 			}
-			if (old_shag == 3 || old_shag == 4) {//для обычных шашек
+			if (old_shag == 3 || old_shag == 4) {//для дамок
+				//proverka_X = tmpX - tmpXold;
+				//proverka_Y = tmpY - tmpYold;
+				if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||//если шашка сделала ход в какую либо сторону на 2 клетки
+					(proverka_Y == 2 && proverka_X == -2) || (proverka_Y == -2 && proverka_X == -2))
+				{
+					(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+					(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
+
+					if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
+						shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
+						peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
+					}
+				}
+
+
+
+
 				shashki[tmpYold][tmpXold] = 0;
 				shashki[tmpY][tmpX] = old_shag;
-				print(output, 0, 68, "                                    "); cout << endl;
+				print(output, 0, 68, "                                                  "); cout << endl;
 
 			}
 			//if (old_shag == 1 && tmpY == 7) { old_shag = 3; }//Если белая шака дошла до противоположного конца поля она становится белой дамкой
