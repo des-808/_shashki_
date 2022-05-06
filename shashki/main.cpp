@@ -50,6 +50,9 @@ const char teshka_left = 180;
 const char teshka_right = 195;
 const char krestik = 197;
 
+void print(int i, int n, char ch);
+void print(int i, int n, char ch0, char ch1);
+void print(HANDLE output, short x, short y, string s);
 pair<short, short> arrow(HANDLE output, short y, short x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy);
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole);
 
@@ -60,12 +63,12 @@ int main(void) {
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 CONSOLE_FONT_INFOEX fontInfo;
-const int kollvo_yacheek = 8;
-const int zerro_pos_xx = 18;
-const int zerro_pos_yy = 4;
-const int step_xx = 14;
-const int step_yy = 7;
-int dl_yacheiki = 7;
+const int  kollvo_yacheek = 8;
+const int  zerro_pos_xx = 18;
+const int  zerro_pos_yy = 4;
+const int  step_xx = 14;
+const int  step_yy = 7;
+const int  dl_yacheiki = 7;
 const char probel = ' ';//176
 const char black = ' ';
 const char white = 178;// 219;//178;//0xDB;//153;178
@@ -79,6 +82,7 @@ const char zapolnitel = 219;//'*';
 short tmpX, tmpY, tmpOldX, tmpOldY, tmpXold, tmpYold, count;
 tmpX = tmpY = tmpOldX = tmpOldY = tmpXold = tmpYold = count = 0;
 bool game = true;
+bool peremeshenie = true;
 int old_shag = 0;
 int new_shag = 0;
 bool old_bool = true;
@@ -162,8 +166,8 @@ do {
 
 	setlocale(LC_ALL, "C");
 	SetConsoleCursorPosition(output, { 0, 0 });//для построения таблицы курсор устанавливаем в положение 0.0
-	for (int i = 1; i < kollvo_yacheek + 4; i++) { cout << probel; } cout << ugol_l_up;//относительно 4. Два пробела в начале и 2 после цифры
-	for (int i = 0; i < kollvo_yacheek * dl_yacheiki; i++) { cout << horizontal_cherta << horizontal_cherta; }cout << ugol_r_up << endl;
+	print(1, kollvo_yacheek + 4,probel);cout << ugol_l_up;//4 - это 2 пробела в начале и 2 после цифры
+	print(0, kollvo_yacheek * dl_yacheiki, horizontal_cherta, horizontal_cherta);cout << ugol_r_up << endl;
 	mask = simvol = outs = 0;
 	for (int i = 0, t = kollvo_yacheek; i < kollvo_yacheek; i++, t--) {//мега квадрат строк
 		int c = 0;
@@ -182,24 +186,22 @@ do {
 				}
 				else {
 					//cout << ((c == 0)&& (k == (dl_yacheiki * 2)-1)&&tmpYold==z &&tmpXold==i ) ? white : shashki_white[c][k];//эта штука делает псевдовыделение при захвате шашки
-					if (shashki[i][z] == 1) { for (int k = 0; k < dl_yacheiki * 2; k++) { cout << (((c == 0 || c == 6) && ((k == (dl_yacheiki * 2) - 1) || k == 0) && tmpYold == i && tmpXold == z) ? white : shashki_white[c][k]); } }
+					if		(shashki[i][z] == 0) { for (int s = 0; s < dl_yacheiki; s++) { cout << probel << probel; } }//если ячейка нулевая то пишем в неё пробелы так как это чёрная клетка
+					else if (shashki[i][z] == 1) { for (int k = 0; k < dl_yacheiki * 2; k++) { cout << (((c == 0 || c == 6) && ((k == (dl_yacheiki * 2) - 1) || k == 0) && tmpYold == i && tmpXold == z) ? white : shashki_white[c][k]); } }
 					else if (shashki[i][z] == 2) { for (int k = 0; k < dl_yacheiki * 2; k++) { cout << (((c == 0 || c == 6) && ((k == (dl_yacheiki * 2) - 1) || k == 0) && tmpYold == i && tmpXold == z) ? white : shashki_black[c][k]); } }
 					else if (shashki[i][z] == 3) { for (int k = 0; k < dl_yacheiki * 2; k++) { cout << (((c == 0 || c == 6) && ((k == (dl_yacheiki * 2) - 1) || k == 0) && tmpYold == i && tmpXold == z) ? white : shashki_white_damka[c][k]); } }
 					else if (shashki[i][z] == 4) { for (int k = 0; k < dl_yacheiki * 2; k++) { cout << (((c == 0 || c == 6) && ((k == (dl_yacheiki * 2) - 1) || k == 0) && tmpYold == i && tmpXold == z) ? white : shashki_black_damka[c][k]); } }
 					//else if (shashki[i][z] == 8) {  }
-					else if (shashki[i][z] == 0) { for (int s = 0; s < dl_yacheiki; s++) { cout << probel << probel; } }
 					//else{}
 				}
 			}
 			c++; //при каждом проходе инкрементируем строку массива считывания из символа
-			cout << vertical_cherta; cout << endl;//полоса в конце строки
+			cout << vertical_cherta << endl;//Вертикальная полоса в конце строки
 		}
 	}
-	for (int i = 1; i < kollvo_yacheek + 4; i++) { cout << probel; }cout << ugol_l_down;//относительно 4. Два пробела в начале и 2 после цифры
-	for (int i = 0; i < kollvo_yacheek * dl_yacheiki; i++)cout << horizontal_cherta << horizontal_cherta;//полоса в низу мегаквадрата
-	cout << ugol_r_down;
-	cout << endl;
-
+	print(1, kollvo_yacheek + 4,probel);cout << ugol_l_down;// 4 - это 2 пробела в начале и 2 после цифры
+	print(0, kollvo_yacheek* dl_yacheiki, horizontal_cherta, horizontal_cherta);cout << ugol_r_down << endl;//полоса в низу мегаквадрата и закрывающий угол рамки
+	
 	int otstup_mezjdu_bukv = 7;
 	mask, simvol, outs = 0;
 	for (int j = 5; j >= 0; j--) {
@@ -213,7 +215,8 @@ do {
 			for (int i = 0; i < otstup_mezjdu_bukv; i++) { cout << probel; }//Выводим отступы между буквами
 		}cout << endl;
 	}
-
+	setlocale(LC_ALL, "Russian");
+	
 	tmpOldX = tmpX; tmpOldY = tmpY;//сохраняем старые значения на случай неправильного выбора ячеек 
 	//функция перемещает курсор по таблице и при нажатии ENTER возвращает позицию выбраной ячейки,принимает старое значение позиции что-бы курсор оставался в той же позиции
 	//так же принимает размеры столбцов и ячеек,нулевые позиции по X и Y,и шаг перемещения по X и Y
@@ -221,10 +224,10 @@ do {
 	tmpY = mrvs.first; tmpX = mrvs.second;	//принимаем значения из функции 
 	if (tmpY == 32767 || tmpX == 32767) { game = false; }//Если по Y = 32767 и X = 32767 то выход из пролграммы по ESCAPE
 	else {//Продолжаем если не ESCAPE
-		if (old_bool) { //выбор ячейки. если не ESCAPE продолжаем дальше
+		if (old_bool && peremeshenie) { //выбор ячейки. если не ESCAPE продолжаем дальше
 			if (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {//0 - пустая ячейка. 8 - белая ячейка
 				old_shag = 0; new_shag = -1;// если ячейка пустая то ошибка
-//old_bool = false;  
+				//old_bool = false;  
 			}
 			else {//ЗАХВАТ
 				if (shashki[tmpY][tmpX] != 0) {//тут выбираем ячейку.Если ячейка нулевая захват не получится
@@ -246,40 +249,70 @@ do {
 			short proverka_X, proverka_Y;
 			proverka_X = tmpX - tmpXold;
 			proverka_Y = tmpY - tmpYold;
-			//setlocale(LC_ALL, "Russian");
-			//SetConsoleCursorPosition(output, { 0, 68 });
-			//if (proverka_Y > 1 || proverka_X > 1 || proverka_Y < -1 || proverka_X < -1) { cout << "Error: шашки ходят на одну клетку " << endl;; }
-			if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||
-				(proverka_Y == 2 && proverka_X == -2) || (proverka_Y == -2 && proverka_X == -2))
-			{
-				(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;
-				(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;
 
-				if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {
-					shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;
-				}
-			}
 			if (old_shag == 1 && tmpY == 7) { old_shag = 3; }//Если белая шака дошла до противоположного конца поля она становится белой дамкой
 			if (old_shag == 2 && tmpY == 0) { old_shag = 4; }//Если чёрная шака дошла до противоположного конца поля она становится чёрной дамкой
+			
+			peremeshenie = true;
+			if(old_shag == 1||old_shag == 2){//для обычных шашек
+				if (proverka_Y > 1 || proverka_X > 1 || proverka_Y < -1 || proverka_X < -1) {
+					peremeshenie = false;
+					if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||
+						(proverka_Y == 2 && proverka_X == -2) || (proverka_Y == -2 && proverka_X == -2))
+					{
+						(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;
+						(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;
+
+						if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {
+							shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;
+							peremeshenie = true;
+						}
+					}
+					if (peremeshenie) {
+					shashki[tmpYold][tmpXold] = 0;
+					shashki[tmpY][tmpX] = old_shag;
+					print(output, 0, 68, "                                    "); cout << endl;
+					}
+					else { print(output, 0, 68, "Error: шашки ходят на одну клетку "); cout << endl; }
+				}
+				else {//если шашка просто делает ход проверяем что она не ходит назад
+					peremeshenie = false;//устанавливаем переменныю разрешение в false. если будет правильный ход то переменная поменяется на true
+					if (old_shag == 1 && ((proverka_Y > 0 && proverka_X > 0) || (proverka_Y > 0 && proverka_X < 0))) { peremeshenie = true; }//проверка для белых
+					if (old_shag == 2 && ((proverka_Y < 0 && proverka_X > 0) || (proverka_Y < 0 && proverka_X < 0))) { peremeshenie = true; }//проверка для чёрных
+					if(peremeshenie){//если ход правильный то перемещаем шашку
+						shashki[tmpYold][tmpXold] = 0;
+						shashki[tmpY][tmpX] = old_shag;
+						print(output, 0, 68, "                                    "); cout << endl;
+					}
+					else { print(output, 0, 68, "Error: шашки не ходят назад "); cout << endl; }//если ход был неправильный. выводим сообщение
+				}
+			}
+			if (old_shag == 3 || old_shag == 4) {//для обычных шашек
+				shashki[tmpYold][tmpXold] = 0;
+				shashki[tmpY][tmpX] = old_shag;
+				print(output, 0, 68, "                                    "); cout << endl;
+
+			}
+			//if (old_shag == 1 && tmpY == 7) { old_shag = 3; }//Если белая шака дошла до противоположного конца поля она становится белой дамкой
+			//if (old_shag == 2 && tmpY == 0) { old_shag = 4; }//Если чёрная шака дошла до противоположного конца поля она становится чёрной дамкой
 			//if	  (proverka_Y < 0 && proverka_X > 0) { cout << "верх право                    ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
 			//else if (proverka_Y < 0 && proverka_X < 0) { cout << "верх лево                     ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
 			//else if (proverka_Y > 0 && proverka_X > 0) { cout << "низ правово                   ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
 			//else if (proverka_Y > 0 && proverka_X < 0) { cout << "низ лево                      ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
-			shashki[tmpYold][tmpXold] = 0;
-			shashki[tmpY][tmpX] = old_shag;
-			setlocale(LC_ALL, "Russian");
+			
 			SetConsoleCursorPosition(output, { 0, 64 });
 			cout << "Y" << "        " << "X" << endl;
 			cout << tmpYold << "        " << tmpXold << "        " << "Захват" << endl;
 			cout << tmpY << "        " << tmpX << "        " << "Перенос" << endl;
-			cout << tmpY - tmpYold << "        " << tmpX - tmpXold << "        ";
+			cout << tmpY - tmpYold << "        " << tmpX - tmpXold << "        "<<endl;
+			
 		}
 
 	}
 
 	/*setlocale(LC_ALL, "Russian");
-	SetConsoleCursorPosition(output, { 0, 64 });*/
-	//cout << endl << tmpY << TAB << tmpX;
+	SetConsoleCursorPosition(output, { 0, 64 });
+	cout << endl << tmpY << TAB << tmpX;*/
 
 
 } while (game);
@@ -289,7 +322,17 @@ cout << "THE END                                    " << endl;
 
 system("pause");
 }
-
+//print(1, kollvo_yacheek+4);
+void print(int i,int n,char ch) {
+	for (; i < n; i++) { cout << ch; }//for (int i = 1; i < kollvo_yacheek + 4; i++) { cout << probel; }
+}
+void print(int i, int n, char ch0, char ch1) {
+	for (; i < n; i++) { cout << ch0 << ch1; }
+}
+void print(HANDLE output,short x,short y,string s) {
+	SetConsoleCursorPosition(output, { x, y });
+	cout << s;
+}
 pair<short, short> arrow(HANDLE output, short y, short x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy) {
 	//int row = 3;//X               //  //int row = 8;//X 
 	//int column = 3;//Y            //	//int column = 8;//Y 
