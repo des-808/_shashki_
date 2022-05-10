@@ -66,13 +66,13 @@ stepperX = stepperY = 0;
 //					{8,2,8,2,8,2,8,2},
 //					{2,8,2,8,2,8,2,8} };//стартовая таблица;
 int shashki[8][8]{  {8,1,8,1,8,1,8,1},
-					{1,8,1,8,0,8,1,8},
-					{8,1,8,1,8,1,8,1},
+					{0,8,1,8,0,8,1,8},
+					{8,0,8,1,8,1,8,1},
 					{0,8,2,8,0,8,0,8},
-					{8,2,8,0,8,1,8,0},
+					{8,2,8,2,8,1,8,0},
 					{2,8,0,8,0,8,2,8},
 					{8,2,8,2,8,2,8,2},
-					{2,8,2,8,3,8,2,8} };//стартовая таблица;
+					{2,8,2,8,2,8,3,8} };//стартовая таблица;
 
 HANDLE output;
 output = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -245,12 +245,14 @@ do {
 				if (proverka_Y < 0 && proverka_X < 0) { 
 					
 					for(int i = 0;i<stepperX;i++){
-						if ((shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0)||) {}
-						if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
-						if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
-						if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
-						proverka_kletok(proverka_Y, proverka_X);
-						cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
+						if	    ((shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0)) {																 cout << "Пустая клетка |"; }
+						else if ((shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 1) || (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 3)) { cout << "Белые         |"; }
+						else if ((shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 2) || (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 4)) { cout << "Чёрные        |"; }
+						//else if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
+						//proverka_kletok(proverka_Y, proverka_X);
+						(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+						(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
+						//cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
 					}
 					
 					
