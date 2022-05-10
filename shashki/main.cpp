@@ -38,12 +38,9 @@ void arrow(HANDLE output, short& y, short& x, const int row, const int column, c
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole);
 
 int main(void) {
-
 	setlocale(LC_ALL, "Russian");
-
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 //CONSOLE_FONT_INFOEX fontInfo;
-
 short tmpX, tmpY, tmpOldX, tmpOldY, tmpXold, tmpYold, count;
 tmpX = tmpY = tmpOldX = tmpOldY = tmpXold = tmpYold = count = 0;
 bool game = true;
@@ -55,7 +52,7 @@ bool old_bool = true;
 int temp = 0;
 int tmpVspomogatelnaya = 0;//через эту переменную будут передаваться комманды SPACE,или ESCAPE и возможно что-то ещё
 int mask, simvol, outs;
-bool bool_probel = true;
+bool smena_hoda = true;
 #include"peremennye.h"
 //int shashki[8][8]{  {8,1,8,1,8,1,8,1},
 //					{1,8,1,8,1,8,1,8},
@@ -138,16 +135,14 @@ do {
 	//функция перемещает курсор по таблице и при нажатии ENTER возвращает позицию выбраной ячейки,принимает старое значение позиции что-бы курсор оставался в той же позиции
 	//так же принимает размеры столбцов и ячеек,нулевые позиции по X и Y,и шаг перемещения по X и Y
 	arrow(output, tmpY, tmpX, kollvo_yacheek, kollvo_yacheek, zerro_pos_xx, zerro_pos_yy, step_xx, step_yy,tmpVspomogatelnaya);
-	//tmpY; tmpX;	//меняют значения в функции по ссылкам.В tmpVspomogatelnaya будут передаваться события ESCAPE,SPACE и возможно что то ещё
+	//tmpY; tmpX;//меняются значения в функции по ссылкам.В tmpVspomogatelnaya будут передаваться события ESCAPE,SPACE и возможно что то ещё
 	if (tmpVspomogatelnaya == 32767) { game = false; }//Если tmpVspomogatelnaya = 32767 то выход из пролграммы по ESCAPE
 	else {//Продолжаем если не ESCAPE
 		if (tmpVspomogatelnaya == 16382) {tmpVspomogatelnaya = 0;//если нажали пробел смена хода между белыми и чёрными шашками
-		bool_probel = false;//нужен для того что бы при передаче хода код обходил выбор шашки в которой клетке стоит курсор
-		old_shag = 0; new_shag = -1;
-			hod = ((hod) ? false : true); //tmpY = tmpOldY; tmpX = tmpOldX;
+		old_shag = 0; new_shag = -1;hod = ((hod) ? false : true);//смена хода
 		}
-		if(bool_probel){//если нажали пробел(передача хода) то в этот блок не заходим на этой итерации
-			if (old_bool && peremeshenie) { //выбор ячейки. если не ESCAPE продолжаем дальше
+		else{//если нажали пробел(передача хода) то в этот блок не заходим на этой итерации
+			if (old_bool && peremeshenie) { //выбор ячейки. если не ESCAPE И не SPACE продолжаем дальше
 				if (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {//0 - пустая ячейка. 8 - белая ячейка
 					old_shag = 0; new_shag = -1;// если ячейка пустая то ошибка
 					//old_bool = false;  
@@ -166,7 +161,6 @@ do {
 				}
 			}
 		}
-		bool_probel = true;
 		if (shashki[tmpY][tmpX] == 0) { new_shag = shashki[tmpY][tmpX]; old_bool = true; } //перенос ячейки
 		else { new_shag = -1; }//Если клетка занята то ни чего не делаем
 		if (old_shag != new_shag && new_shag == 0) {
@@ -189,12 +183,28 @@ do {
 
 						if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
 							shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
+							SetConsoleCursorPosition(output, { 0, 69 });
+							smena_hoda = true;
+							if (hod) {//true ход белых проверяем чёрные по соседству
+								if (((shashki[tmpY + 1 ][tmpX +  1] == 2) || (shashki[tmpY +  1][tmpX +  1] == 4)) && (shashki[tmpY +  2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
+								if (((shashki[tmpY + -1][tmpX +  1] == 2) || (shashki[tmpY + -1][tmpX +  1] == 4)) && (shashki[tmpY + -2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
+								if (((shashki[tmpY + 1 ][tmpX + -1] == 2) || (shashki[tmpY +  1][tmpX + -1] == 4)) && (shashki[tmpY +  2][tmpX + -2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
+								if (((shashki[tmpY + -1][tmpX + -1] == 2) || (shashki[tmpY + -1][tmpX + -1] == 4)) && (shashki[tmpY + -2][tmpX + -2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
+							}
+							else {//false чод чёрных проверяем белые по соседству
+								if (((shashki[tmpY +  1][tmpX +  1] == 1) || (shashki[tmpY +  1][tmpX +  1] == 3)) && (shashki[tmpY +  2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить белую шашку "; }
+								if (((shashki[tmpY + -1][tmpX +  1] == 1) || (shashki[tmpY + -1][tmpX +  1] == 3)) && (shashki[tmpY + -2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить белую шашку "; }
+								if (((shashki[tmpY +  1][tmpX + -1] == 1) || (shashki[tmpY +  1][tmpX + -1] == 3)) && (shashki[tmpY +  2][tmpX + -2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить белую шашку "; }
+								if (((shashki[tmpY + -1][tmpX + -1] == 1) || (shashki[tmpY + -1][tmpX + -1] == 3)) && (shashki[tmpY + -2][tmpX + -2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить белую шашку "; }
+							}
+							
 							peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
 						}
 					}
 					if (peremeshenie) {//перемещаем выбранную шашку на новое место
 					shashki[tmpYold][tmpXold] = 0;
 					shashki[tmpY][tmpX] = old_shag;
+					if (smena_hoda) { hod = ((hod) ? false : true); }
 					print(output, 0, 68, "                                              "); cout << endl;
 					}
 					else { print(output, 0, 68, "Error: шашки могут бить только через клетку  "); cout << endl; }
