@@ -1,0 +1,13 @@
+﻿"shashki.exe" (Win32). Загружено "C:\Users\des808\source\repos\shashki\x64\Debug\shashki.exe". Символы загружены.
+"shashki.exe" (Win32). Загружено "C:\Windows\System32\ntdll.dll". 
+"shashki.exe" (Win32). Загружено "C:\Windows\System32\kernel32.dll". 
+"shashki.exe" (Win32). Загружено "C:\Windows\System32\KernelBase.dll". 
+"shashki.exe" (Win32). Загружено "C:\Windows\System32\msvcp140d.dll". 
+"shashki.exe" (Win32). Загружено "C:\Windows\System32\vcruntime140d.dll". 
+"shashki.exe" (Win32). Загружено "C:\Windows\System32\vcruntime140_1d.dll". 
+"shashki.exe" (Win32). Загружено "C:\Windows\System32\ucrtbased.dll". 
+Поток 0x58e4 завершился с кодом 0 (0x0).
+Поток 0xd9c завершился с кодом 0 (0x0).
+Поток 0x2fbc завершился с кодом 0 (0x0).
+Поток 0x2344 завершился с кодом 3221225786 (0xc000013a).
+Программа "[22772] shashki.exe" завершилась с кодом 3221225786 (0xc000013a).

@@ -50,10 +50,11 @@ const char teshka_left = 180;
 const char teshka_right = 195;
 const char krestik = 197;
 
-void print(int i, int n, char ch);
-void print(int i, int n, char ch0, char ch1);
+void print(int i, int SIZE, char ch);
+void print(int i, int SIZE, char ch0, char ch1);
 void print(HANDLE output, short x, short y, string s);
-pair<short, short> arrow(HANDLE output, short y, short x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy);
+//pair<short, short> 
+void arrow(HANDLE output, short& y, short& x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy);
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole);
 
 int main(void) {
@@ -62,10 +63,10 @@ int main(void) {
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-CONSOLE_FONT_INFOEX fontInfo;
+//CONSOLE_FONT_INFOEX fontInfo;
 const int  kollvo_yacheek = 8;
 const int  zerro_pos_xx = 18;
-const int  zerro_pos_yy = 4;
+const int  zerro_pos_yy = 5;
 const int  step_xx = 14;
 const int  step_yy = 7;
 const int  dl_yacheiki = 7;
@@ -83,6 +84,7 @@ short tmpX, tmpY, tmpOldX, tmpOldY, tmpXold, tmpYold, count;
 tmpX = tmpY = tmpOldX = tmpOldY = tmpXold = tmpYold = count = 0;
 bool game = true;
 bool peremeshenie = true;
+bool hod = true;//true-ходят белые. false-ходят чёрные
 int old_shag = 0;
 int new_shag = 0;
 bool old_bool = true;
@@ -172,9 +174,11 @@ HANDLE output;
 output = GetStdHandle(STD_OUTPUT_HANDLE);
 
 do {
-
+	setlocale(LC_ALL, "Russian");
+	if (hod) { print(output, 0, 0, "                                                           ХОДЯТ БЕЛЫЕ ШАШКИ     ");  }//tmpY = 0; tmpX = 0;
+	else{	   print(output, 0, 0, "                                                           ХОДЯТ ЧЁРНЫЕ ШАШКИ    ");  }//tmpY = 7; tmpX = 0;
 	setlocale(LC_ALL, "C");
-	SetConsoleCursorPosition(output, { 0, 0 });//для построения таблицы курсор устанавливаем в положение 0.0
+	SetConsoleCursorPosition(output, { 0, 1 });//для построения таблицы курсор устанавливаем в положение 0.1
 	print(1, kollvo_yacheek + 4,probel);cout << ugol_l_up;//4 - это 2 пробела в начале и 2 после цифры
 	print(0, kollvo_yacheek * dl_yacheiki, horizontal_cherta, horizontal_cherta);cout << ugol_r_up << endl;
 	mask = simvol = outs = 0;
@@ -229,10 +233,15 @@ do {
 	tmpOldX = tmpX; tmpOldY = tmpY;//сохраняем старые значения на случай неправильного выбора ячеек 
 	//функция перемещает курсор по таблице и при нажатии ENTER возвращает позицию выбраной ячейки,принимает старое значение позиции что-бы курсор оставался в той же позиции
 	//так же принимает размеры столбцов и ячеек,нулевые позиции по X и Y,и шаг перемещения по X и Y
-	pair<short, short> mrvs = arrow(output, tmpY, tmpX, kollvo_yacheek, kollvo_yacheek, zerro_pos_xx, zerro_pos_yy, step_xx, step_yy);
-	tmpY = mrvs.first; tmpX = mrvs.second;	//принимаем значения из функции 
-	if (tmpY == 32767 || tmpX == 32767) { game = false; }//Если по Y = 32767 и X = 32767 то выход из пролграммы по ESCAPE
+	//pair<short, short> mrvs = 
+		arrow(output, tmpY, tmpX, kollvo_yacheek, kollvo_yacheek, zerro_pos_xx, zerro_pos_yy, step_xx, step_yy);
+	//tmpY = mrvs.first; tmpX = mrvs.second;	//принимаем значения из функции 
+	if (tmpY == 32767 && tmpX == 32767) { game = false; }//Если по Y = 32767 и X = 32767 то выход из пролграммы по ESCAPE
 	else {//Продолжаем если не ESCAPE
+		if (tmpY == 16382 && tmpX == 16382) {//если нажали пробел смена хода между белыми и чёрными шашками
+			tmpY = tmpOldY; tmpX = tmpOldX; old_shag = 0; new_shag = -1;
+			//hod = ((hod) ? false : true); tmpY = 0; tmpX = 0;
+		}
 		if (old_bool && peremeshenie) { //выбор ячейки. если не ESCAPE продолжаем дальше
 			if (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {//0 - пустая ячейка. 8 - белая ячейка
 				old_shag = 0; new_shag = -1;// если ячейка пустая то ошибка
@@ -292,6 +301,7 @@ do {
 						shashki[tmpYold][tmpXold] = 0;
 						shashki[tmpY][tmpX] = old_shag;
 						print(output, 0, 68, "                                    "); cout << endl;
+						hod = ((hod) ? false : true); tmpY = 0; tmpX = 0;//смена хода
 					}
 					else { print(output, 0, 68, "Error: шашки не ходят назад                "); cout << endl; }//если ход был неправильный. выводим сообщение
 				}
@@ -348,46 +358,49 @@ cout << "THE END                                    " << endl;
 
 system("pause");
 }
-//print(1, kollvo_yacheek+4);
-void print(int i,int n,char ch) {
-	for (; i < n; i++) { cout << ch; }//for (int i = 1; i < kollvo_yacheek + 4; i++) { cout << probel; }
+void print(int i,int SIZE,char ch) {
+	for (; i < SIZE; i++) { cout << ch; }//for (int i = 1; i < kollvo_yacheek + 4; i++) { cout << probel; }
 }
-void print(int i, int n, char ch0, char ch1) {
-	for (; i < n; i++) { cout << ch0 << ch1; }
+void print(int i, int SIZE, char ch0, char ch1) {
+	for (; i < SIZE; i++) { cout << ch0 << ch1; }
 }
-void print(HANDLE output,short x,short y,string s) {
+void print(HANDLE output,short x,short y,string stroka) {
 	SetConsoleCursorPosition(output, { x, y });
-	cout << s;
+	cout << stroka;
 }
-pair<short, short> arrow(HANDLE output, short y, short x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy) {
-	//int row = 3;//X               //  //int row = 8;//X 
-	//int column = 3;//Y            //	//int column = 8;//Y 
-	//short x = 1;                  //	//short x = 0;      
-	//short y = 1;					//	//short y = 0;
-	/*const int zerro_pos_xx = 3;   //	/*const int zerro_pos_xx = 18;
-	const int zerro_pos_yy = 2;     //	const int zerro_pos_yy = 4;
-	const int step_xx = 6;          //	const int step_xx = 14;
-	const int step_yy = 4;*/        //	const int step_yy = 7;*/     
-	short xx = zerro_pos_xx;//short xx = 3;// 3 =лево; 9 =центр; 15 = право;
-	short yy = zerro_pos_yy;//short yy = 2;// 2 = нулевая строка; 6 = первая строка; 10 = вторая строка;
-	for (int i = x; i != 0; i--) { xx += step_xx; }
-	for (int j = y; j != 0; j--) { yy += step_yy; }
-	int l = 0;
+//pair<short, short> 
+void arrow(HANDLE output, short& y, short& x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy) {
+	//функция перемещает курсор по таблице и при нажатии ENTER возвращает позицию выбраной ячейки,принимает старое значение позиции что-бы курсор оставался в той же позиции
+	//так же принимает размеры столбцов и ячеек,нулевые позиции по X и Y,и шаг перемещения по X и Y
+	//  //int row = 8;//X 
+	//	//int column = 8;//Y 
+	//	//short x = 0;      
+	//	//short y = 0;
+	//	/*const int zerro_pos_xx = 18;
+	//	const int zerro_pos_yy = 4;
+	//	const int step_xx = 14;
+	//	const int step_yy = 7;*/     
+	short xx = zerro_pos_xx;//инициализируем нулевую позицию по координате x
+	short yy = zerro_pos_yy;//инициализируем нулевую позицию по координате y
+	for (int i = x; i != 0; i--) { xx += step_xx; }//переносим курсор на x шагов. в step_xx хранится значение шага между точками перемещения курсора по оси xx
+	for (int j = y; j != 0; j--) { yy += step_yy; }//переносим курсор на y шагов. в step_yy хранится значение шага между точками перемещения курсора по оси yy
+	int l = 0;// в l будем принимать введённый символ с клавиатуры
 	SetConsoleCursorPosition(output, { xx, yy });//выводим курсор по координатам YY и XX
-	while (l != ENTER && l != ESCAPE) {
+	while (l != ENTER && l != ESCAPE && l != SPACE) {
 		l = _getch();
 		switch (l) {
-		case UP_ARROW:		y--; yy -= step_yy; if (y == -1) { y = column - 1; yy = (y * step_yy) + zerro_pos_yy; }	break;//up
-		case DOWN_ARROW:	y++; yy += step_yy; if (y == column) { y = 0;	   yy = zerro_pos_yy; }					break;//down
-		case LEFT_ARROW:	x--; xx -= step_xx; if (x == -1) { x = row - 1;	   xx = (x * step_xx) + zerro_pos_xx; }	break;//left
-		case RIGHT_ARROW:	x++; xx += step_xx; if (x == row) { x = 0;	   xx = zerro_pos_xx; }				break;//right
+		case UP_ARROW:		y--; yy -= step_yy; if (y == -1)     { y = column - 1; yy = (y * step_yy) + zerro_pos_yy; }	break;//up 
+		case DOWN_ARROW:	y++; yy += step_yy; if (y == column) { y = 0;	       yy = zerro_pos_yy; }					break;//down
+		case LEFT_ARROW:	x--; xx -= step_xx; if (x == -1)     { x = row - 1;	   xx = (x * step_xx) + zerro_pos_xx; }	break;//left
+		case RIGHT_ARROW:	x++; xx += step_xx; if (x == row)    { x = 0;	       xx = zerro_pos_xx; }				    break;//right
 		case ESCAPE: x = 32767; y = 32767; break;
+		case SPACE:  x = 16382; y = 16382; break;
 		case 224:break;
 		default: break;
 		}
-		SetConsoleCursorPosition(output, { xx, yy });
+		SetConsoleCursorPosition(output, { xx, yy }); //перемещаем курсор при нажатиях стрелок на клавиатуре
 	}
-	return make_pair(y, x);
+	//return make_pair(y, x);
 }
 
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole) {
