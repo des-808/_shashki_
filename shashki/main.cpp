@@ -35,6 +35,7 @@ void print(int i, int SIZE, char ch);
 void print(int i, int SIZE, char ch0, char ch1);
 void print(HANDLE output, short x, short y, string s); 
 void arrow(HANDLE output, short& y, short& x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy,int& tmpVspomogatelnaya);
+template<typename T>void proverka_kletok(T& proverka_Y, T& proverka_X);
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole);
 
 int main(void) {
@@ -53,7 +54,9 @@ int temp = 0;
 int tmpVspomogatelnaya = 0;//через эту переменную будут передаваться комманды SPACE,или ESCAPE и возможно что-то ещё
 int mask, simvol, outs;
 bool smena_hoda = true;
-#include"peremennye.h"
+int stepperX, stepperY;//сделал для просчета клеток для хода дамок
+stepperX = stepperY = 0;
+#include"massivy.h"
 //int shashki[8][8]{  {8,1,8,1,8,1,8,1},
 //					{1,8,1,8,1,8,1,8},
 //					{8,1,8,1,8,1,8,1},
@@ -63,11 +66,11 @@ bool smena_hoda = true;
 //					{8,2,8,2,8,2,8,2},
 //					{2,8,2,8,2,8,2,8} };//стартовая таблица;
 int shashki[8][8]{  {8,1,8,1,8,1,8,1},
-					{1,8,1,8,1,8,1,8},
+					{1,8,1,8,0,8,1,8},
 					{8,1,8,1,8,1,8,1},
-					{0,8,0,8,0,8,0,8},
-					{8,2,8,0,8,0,8,0},
-					{2,8,0,8,2,8,2,8},
+					{0,8,2,8,0,8,0,8},
+					{8,2,8,0,8,1,8,0},
+					{2,8,0,8,0,8,2,8},
 					{8,2,8,2,8,2,8,2},
 					{2,8,2,8,3,8,2,8} };//стартовая таблица;
 
@@ -78,6 +81,7 @@ do {
 	setlocale(LC_ALL, "Russian");
 	if (hod) { print(output, 0, 0, "                                                           ХОДЯТ БЕЛЫЕ ШАШКИ     ");  }//tmpY = 0; tmpX = 0;
 	else{	   print(output, 0, 0, "                                                           ХОДЯТ ЧЁРНЫЕ ШАШКИ    ");  }//tmpY = 7; tmpX = 0;
+	
 	setlocale(LC_ALL, "C");
 	SetConsoleCursorPosition(output, { 0, 1 });//для построения таблицы курсор устанавливаем в положение 0.1
 	print(1, kollvo_yacheek + 4,probel);cout << ugol_l_up;//4 - это 2 пробела в начале и 2 после цифры
@@ -135,6 +139,7 @@ do {
 	//функция перемещает курсор по таблице и при нажатии ENTER возвращает позицию выбраной ячейки,принимает старое значение позиции что-бы курсор оставался в той же позиции
 	//так же принимает размеры столбцов и ячеек,нулевые позиции по X и Y,и шаг перемещения по X и Y
 	arrow(output, tmpY, tmpX, kollvo_yacheek, kollvo_yacheek, zerro_pos_xx, zerro_pos_yy, step_xx, step_yy,tmpVspomogatelnaya);
+	print(output, 0, 69, "                                              ");
 	//tmpY; tmpX;//меняются значения в функции по ссылкам.В tmpVspomogatelnaya будут передаваться события ESCAPE,SPACE и возможно что то ещё
 	if (tmpVspomogatelnaya == 32767) { game = false; }//Если tmpVspomogatelnaya = 32767 то выход из пролграммы по ESCAPE
 	else {//Продолжаем если не ESCAPE
@@ -143,12 +148,13 @@ do {
 		}
 		else{//если нажали пробел(передача хода) то в этот блок не заходим на этой итерации
 			if (old_bool && peremeshenie) { //выбор ячейки. если не ESCAPE И не SPACE продолжаем дальше
-				if (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {//0 - пустая ячейка. 8 - белая ячейка
+				if  (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {//0 - пустая ячейка. 8 - белая ячейка
 					old_shag = 0; new_shag = -1;// если ячейка пустая то ошибка
 					//old_bool = false;  
 				}
 				else {//ЗАХВАТ
-					if (shashki[tmpY][tmpX] != 0) {//тут выбираем ячейку.Если ячейка нулевая захват не получится
+					if ((shashki[tmpY][tmpX] != 0) &&((shashki[tmpY][tmpX] == 1 || shashki[tmpY][tmpX] == 3) &&  hod) ||
+													 ((shashki[tmpY][tmpX] == 2 || shashki[tmpY][tmpX] == 4) && !hod)) {//тут выбираем ячейку.Если ячейка нулевая захват не получится
 						old_shag = shashki[tmpY][tmpX]; //выбор ячейки
 						tmpYold = tmpY; tmpXold = tmpX;
 						old_bool = false;
@@ -178,8 +184,9 @@ do {
 					if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||//если шашка сделала ход в какую либо сторону на 2 клетки
 						(proverka_Y == 2 && proverka_X == -2) || (proverka_Y == -2 && proverka_X == -2))
 					{
-						(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
-						(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
+						proverka_kletok(proverka_Y, proverka_X);//вычисляем псевдо адрес промежуточной клетки
+						//(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+						//(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
 
 						if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
 							shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
@@ -206,6 +213,7 @@ do {
 					shashki[tmpY][tmpX] = old_shag;
 					if (smena_hoda) { hod = ((hod) ? false : true); }
 					print(output, 0, 68, "                                              "); cout << endl;
+					
 					}
 					else { print(output, 0, 68, "Error: шашки могут бить только через клетку  "); cout << endl; }
 				}
@@ -223,13 +231,40 @@ do {
 				}
 			}
 			if (old_shag == 3 || old_shag == 4) {//для дамок
-				//proverka_X = tmpX - tmpXold;
-				//proverka_Y = tmpY - tmpYold;
-				//if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||//если шашка сделала ход в какую либо сторону на 2 клетки
-				//	(proverka_Y == 2 && proverka_X == -2) || (proverka_Y == -2 && proverka_X == -2))
-				//{
-					(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
-					(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
+				SetConsoleCursorPosition(output, { 0, 65 });
+				stepperX = (tmpX > tmpXold) ? tmpX - tmpXold : tmpXold - tmpX;
+				stepperY = (tmpY > tmpYold) ? tmpY - tmpYold : tmpYold - tmpY;
+				if (proverka_Y < 0 && proverka_X > 0) {
+					for(int i = 0;i<stepperX;i++){
+						//if () {}
+						proverka_kletok(proverka_Y, proverka_X);
+						cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
+					}
+
+				 }
+				if (proverka_Y < 0 && proverka_X < 0) { 
+					
+					for(int i = 0;i<stepperX;i++){
+						if ((shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0)||) {}
+						if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
+						if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
+						if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
+						proverka_kletok(proverka_Y, proverka_X);
+						cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
+					}
+					
+					
+					
+					//cout << "верх лево                     ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ 
+				}
+				if (proverka_Y > 0 && proverka_X > 0) { cout << "низ правово                   ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
+				if (proverka_Y > 0 && proverka_X < 0) { cout << "низ лево                      ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
+				
+
+				//proverka_kletok(proverka_Y, proverka_X);//вычисляем псевдо адрес промежуточной клетки
+
+					//(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+					//(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
 
 					if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
 						shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
@@ -243,16 +278,16 @@ do {
 			}
 			//if (old_shag == 1 && tmpY == 7) { old_shag = 3; }//Если белая шака дошла до противоположного конца поля она становится белой дамкой
 			//if (old_shag == 2 && tmpY == 0) { old_shag = 4; }//Если чёрная шака дошла до противоположного конца поля она становится чёрной дамкой
-			//if	  (proverka_Y < 0 && proverka_X > 0) { cout << "верх право                    ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
-			//else if (proverka_Y < 0 && proverka_X < 0) { cout << "верх лево                     ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
-			//else if (proverka_Y > 0 && proverka_X > 0) { cout << "низ правово                   ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
-			//else if (proverka_Y > 0 && proverka_X < 0) { cout << "низ лево                      ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
+			//
 			
-			SetConsoleCursorPosition(output, { 0, 65 });
-			cout << "Y" << "        " << "X" << endl;
-			cout << tmpYold << "        " << tmpXold << "        " << "Захват" << endl;
-			cout << tmpY << "        " << tmpX << "        " << "Перенос" << endl;
-			cout << tmpY - tmpYold << "        " << tmpX - tmpXold << "        "<<endl;
+			
+			SetConsoleCursorPosition(output, { 0, 66 });
+			cout << setw(3) << "Y" << "        " << "X" << endl;
+			cout << setw(3) << tmpYold << "        " << tmpXold << "        " << "Захват" << endl;
+			cout << setw(3) << tmpY << "        " << tmpX << "        " << "Перенос" << endl;
+			cout << setw(3) << tmpY - tmpYold << "        " << tmpX - tmpXold << "        "<<endl;
+			cout << setw(3) << tmpYold - tmpY << "        " << tmpXold - tmpX << "        " << endl;
+			cout << setw(3) << stepperY << "        " << stepperX << "        " << endl;
 			
 		}
 
@@ -264,10 +299,11 @@ do {
 
 
 } while (game);
-SetConsoleCursorPosition(output, { 0, 64 });
-cout << "THE END                                    " << endl;
-
-
+SetConsoleCursorPosition(output, { 0, 65 });
+cout << "                                    THE END                                    " << endl;
+cout << "                                                                               " << endl;
+cout << "                                                                               " << endl;
+cout << "                                                                               " << endl;
 system("pause");
 }
 void print(int i,int SIZE,char ch) {
@@ -312,7 +348,10 @@ void arrow(HANDLE output, short& y, short& x, const int row, const int column, c
 		SetConsoleCursorPosition(output, { xx, yy }); //перемещаем курсор при нажатиях стрелок на клавиатуре
 	}
 }
-
+template<typename T>void proverka_kletok(T& proverka_Y,T& proverka_X){
+(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
+}
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole) {
 	fontInfo.cbSize = sizeof(fontInfo);
 	GetCurrentConsoleFontEx(hConsole, TRUE, &fontInfo);
