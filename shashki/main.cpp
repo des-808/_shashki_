@@ -138,14 +138,13 @@ do {
 	//функция перемещает курсор по таблице и при нажатии ENTER возвращает позицию выбраной ячейки,принимает старое значение позиции что-бы курсор оставался в той же позиции
 	//так же принимает размеры столбцов и ячеек,нулевые позиции по X и Y,и шаг перемещения по X и Y
 	arrow(output, tmpY, tmpX, kollvo_yacheek, kollvo_yacheek, zerro_pos_xx, zerro_pos_yy, step_xx, step_yy,tmpVspomogatelnaya);
-	//tmpY = mrvs.first; tmpX = mrvs.second;	//принимаем значения из функции 
-	if (tmpVspomogatelnaya == 32767) { game = false; }//Если по Y = 32767 и X = 32767 то выход из пролграммы по ESCAPE
+	//tmpY; tmpX;	//меняют значения в функции по ссылкам.В tmpVspomogatelnaya будут передаваться события ESCAPE,SPACE и возможно что то ещё
+	if (tmpVspomogatelnaya == 32767) { game = false; }//Если tmpVspomogatelnaya = 32767 то выход из пролграммы по ESCAPE
 	else {//Продолжаем если не ESCAPE
 		if (tmpVspomogatelnaya == 16382) {tmpVspomogatelnaya = 0;//если нажали пробел смена хода между белыми и чёрными шашками
 		bool_probel = false;//нужен для того что бы при передаче хода код обходил выбор шашки в которой клетке стоит курсор
 		old_shag = 0; new_shag = -1;
 			hod = ((hod) ? false : true); //tmpY = tmpOldY; tmpX = tmpOldX;
-
 		}
 		if(bool_probel){//если нажали пробел(передача хода) то в этот блок не заходим на этой итерации
 			if (old_bool && peremeshenie) { //выбор ячейки. если не ESCAPE продолжаем дальше
@@ -228,13 +227,9 @@ do {
 					}
 				//}
 
-
-
-
 				shashki[tmpYold][tmpXold] = 0;
 				shashki[tmpY][tmpX] = old_shag;
 				print(output, 0, 68, "                                                  "); cout << endl;
-
 			}
 			//if (old_shag == 1 && tmpY == 7) { old_shag = 3; }//Если белая шака дошла до противоположного конца поля она становится белой дамкой
 			//if (old_shag == 2 && tmpY == 0) { old_shag = 4; }//Если чёрная шака дошла до противоположного конца поля она становится чёрной дамкой
