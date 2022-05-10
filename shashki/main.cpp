@@ -1,32 +1,4 @@
-﻿#include<iostream>
-#include<cstring>
-#include<cstdio>
-#include<cctype>
-#include<locale>
-#include<windows.h>
-#include<fstream>
-#include<conio.h>
-#include<iomanip>
-#include<ctime>
-#include<stdlib.h>
-#include<cstdlib>
-#include <sstream>
-#include <utility>
-
-//using namespace System;
-
-using std::cout;
-using std::cin;
-using std::endl;
-using std::string;
-using std::ofstream;
-using std::ifstream;
-using std::_Iosb;
-using std::setw;
-using std::pair;
-using std::make_pair;
-
-//using namespace std;
+﻿#include"Header.h"
 
 #define UP_ARROW	72
 #define DOWN_ARROW	80
@@ -37,34 +9,11 @@ using std::make_pair;
 #define ESCAPE  27
 #define TAB '\t'
 
-const char vertical_cherta = 179;
-const char horizontal_cherta = 196;
-const char ugol_l_up = 218;
-const char ugol_l_down = 192;
-const char ugol_r_up = 191;
-const char ugol_r_down = 217;
-const char probel = ' ';
 const char teshka_down = 194;
 const char teshka_up = 193;
 const char teshka_left = 180;
 const char teshka_right = 195;
 const char krestik = 197;
-
-void print(int i, int SIZE, char ch);
-void print(int i, int SIZE, char ch0, char ch1);
-void print(HANDLE output, short x, short y, string s);
-//pair<short, short> 
-void arrow(HANDLE output, short& y, short& x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy);
-void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole);
-
-int main(void) {
-
-	setlocale(LC_ALL, "Russian");
-
-HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-//CONSOLE_FONT_INFOEX fontInfo;
-const int  kollvo_yacheek = 8;
 const int  zerro_pos_xx = 18;
 const int  zerro_pos_yy = 5;
 const int  step_xx = 14;
@@ -80,6 +29,21 @@ const char ugol_l_down = 192;
 const char ugol_r_up = 191;
 const char ugol_r_down = 217;
 const char zapolnitel = 219;//'*';
+const int  kollvo_yacheek = 8;
+
+void print(int i, int SIZE, char ch);
+void print(int i, int SIZE, char ch0, char ch1);
+void print(HANDLE output, short x, short y, string s); 
+void arrow(HANDLE output, short& y, short& x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy,int& tmpVspomogatelnaya);
+void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole);
+
+int main(void) {
+
+	setlocale(LC_ALL, "Russian");
+
+HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+//CONSOLE_FONT_INFOEX fontInfo;
+
 short tmpX, tmpY, tmpOldX, tmpOldY, tmpXold, tmpYold, count;
 tmpX = tmpY = tmpOldX = tmpOldY = tmpXold = tmpYold = count = 0;
 bool game = true;
@@ -89,36 +53,10 @@ int old_shag = 0;
 int new_shag = 0;
 bool old_bool = true;
 int temp = 0;
-int digits_bytes[10][6]{ //10,7// Digits / Цифры 
-
-		{0b00011000, 0b00100100, 0b00100100, 0b00100100, 0b00100100, 0b00011000 }, // Символ 48  <0> 
-		{0b00001000, 0b00001000, 0b00001000, 0b00001000, 0b00101000, 0b00011000 }, // Символ 49  <1> 
-		{0b00111100, 0b00100000, 0b00010000, 0b00001000, 0b00100100, 0b00011000 }, // Символ 50  <2> 
-		{0b00011000, 0b00100100, 0b00000100, 0b00001000, 0b00100100, 0b00011000 }, // Символ 51  <3> 
-		{0b00000100, 0b00000100, 0b00011100, 0b00100100, 0b00010100, 0b00001100 }, // Символ 52  <4> 
-		{0b00011000, 0b00100100, 0b00000100, 0b00011000, 0b00100000, 0b00111100 }, // Символ 53  <5> 
-		{0b00011000, 0b00100100, 0b00100100, 0b00111000, 0b00100000, 0b00011000 }, // Символ 54  <6> 
-		{0b00010000, 0b00010000, 0b00010000, 0b00001000, 0b00000100, 0b00111100 }, // Символ 55  <7> 
-		{0b00011000, 0b00100100, 0b00100100, 0b00011000, 0b00100100, 0b00011000 }, // Символ 56  <8> 
-		{0b00111000, 0b00000100, 0b00011100, 0b00100100, 0b00100100, 0b00011000 }  // Символ 57  <9> 
-};
-
-int chars_bytes[12][6]{
-	// Roman Smalls / Латиница, строчные 
-		{0b00001100, 0b00010010, 0b00011110, 0b00000010, 0b00010010, 0b00001100 }, // Символ 97  <a> 
-		{0b00011100, 0b00010010, 0b00011010, 0b00010100, 0b00010000, 0b00010000 }, // Символ 98  <b> 
-		{0b00001100, 0b00010010, 0b00010000, 0b00010010, 0b00001100, 0b00000000 }, // Символ 99  <c> 
-		{0b00001010, 0b00010110, 0b00010010, 0b00001110, 0b00000010, 0b00000010 }, // Символ 100 <d> 
-		{0b00001100, 0b00010010, 0b00010000, 0b00011100, 0b00010010, 0b00001100 }, // Символ 101 <e> 
-		{0b00001000, 0b00001000, 0b00001000, 0b00011100, 0b00001000, 0b00000110 }, // Символ 102 <f> 
-		{0b00001110, 0b00010000, 0b00001100, 0b00010010, 0b00010010, 0b00001100 }, // Символ 103 <g> 
-		{0b00010010, 0b00010010, 0b00011010, 0b00010100, 0b00010000, 0b00010000 }, // Символ 104 <h> 
-		{0b00011100, 0b00001000, 0b00001000, 0b00011000, 0b00000000, 0b00001000 }, // Символ 105 <i> 
-		{0b00011000, 0b00000100, 0b00000100, 0b00011100, 0b00000000, 0b00000100 }, // Символ 106 <j> 
-		{0b00010100, 0b00011000, 0b00011000, 0b00010100, 0b00010000, 0b00000000 }, // Символ 107 <k> 
-		{0b00011100, 0b00001000, 0b00001000, 0b00001000, 0b00011000, 0b00000000 }  // Символ 108 <l> 
-};
-
+int tmpVspomogatelnaya = 0;//через эту переменную будут передаваться комманды SPACE,или ESCAPE и возможно что-то ещё
+int mask, simvol, outs;
+bool bool_probel = true;
+#include"peremennye.h"
 //int shashki[8][8]{  {8,1,8,1,8,1,8,1},
 //					{1,8,1,8,1,8,1,8},
 //					{8,1,8,1,8,1,8,1},
@@ -136,40 +74,6 @@ int shashki[8][8]{  {8,1,8,1,8,1,8,1},
 					{8,2,8,2,8,2,8,2},
 					{2,8,2,8,3,8,2,8} };//стартовая таблица;
 
-
-char shashki_white[7][14]{ {black,black,black,black,black,black,white,white,black,black,black,black,black,black},
-							{black,black,black,black,white,white,white,white,white,white,black,black,black,black},
-							{black,black,white,white,white,white,black,black,white,white,white,white,black,black},
-							{black,white,white,white,white,black,black,black,black,white,white,white,white,black},
-							{black,black,white,white,white,white,black,black,white,white,white,white,black,black},
-							{black,black,black,black,white,white,white,white,white,white,black,black,black,black},
-							{black,black,black,black,black,black,white,white,black,black,black,black,black,black} };
-
-char shashki_black[7][14]{ {black,black,black,white,white,white,black,black,white,white,white,black,black,black},
-							{black,black,white,white,black,black,black,black,black,black,white,white,black,black},
-							{white,white,black,black,black,black,black,black,black,black,black,black,white,white},
-							{black,black,black,black,black,black,black,black,black,black,black,black,black,black},
-							{white,white,black,black,black,black,black,black,black,black,black,black,white,white},
-							{black,white,white,white,black,black,black,black,black,black,white,white,black,black},
-							{black,black,black,white,white,white,black,black,white,white,white,black,black,black} };
-
-char shashki_white_damka[7][14]{ {black,black,black,black,black,black,white,white,black,black,black,black,black,black},
-								{black,black,black,black,white,white,black,black,white,white,black,black,black,black},
-								{black,black,white,white,white,black,black,black,black,white,white,white,black,black},
-								{black,white,white,white,black,black,white,white,black,black,white,white,white,black},
-								{black,black,white,white,white,black,black,black,black,white,white,white,black,black},
-								{black,black,black,black,white,white,black,black,white,white,black,black,black,black},
-								{black,black,black,black,black,black,white,white,black,black,black,black,black,black} };
-
-char shashki_black_damka[7][14]{ {black,black,black,white,white,white,black,black,white,white,white,black,black,black},
-								{black,black,white,white,black,black,black,black,black,black,white,white,black,black},
-								{white,white,black,black,black,black,white,white,black,black,black,black,white,white},
-								{black,black,black,black,black,white,black,black,white,black,black,black,black,black},
-								{white,white,black,black,black,black,white,white,black,black,black,black,white,white},
-								{black,white,white,white,black,black,black,black,black,black,white,white,black,black},
-								{black,black,black,white,white,white,black,black,white,white,white,black,black,black} };
-
-int mask, simvol, outs;
 HANDLE output;
 output = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -233,34 +137,37 @@ do {
 	tmpOldX = tmpX; tmpOldY = tmpY;//сохраняем старые значения на случай неправильного выбора ячеек 
 	//функция перемещает курсор по таблице и при нажатии ENTER возвращает позицию выбраной ячейки,принимает старое значение позиции что-бы курсор оставался в той же позиции
 	//так же принимает размеры столбцов и ячеек,нулевые позиции по X и Y,и шаг перемещения по X и Y
-	//pair<short, short> mrvs = 
-		arrow(output, tmpY, tmpX, kollvo_yacheek, kollvo_yacheek, zerro_pos_xx, zerro_pos_yy, step_xx, step_yy);
+	arrow(output, tmpY, tmpX, kollvo_yacheek, kollvo_yacheek, zerro_pos_xx, zerro_pos_yy, step_xx, step_yy,tmpVspomogatelnaya);
 	//tmpY = mrvs.first; tmpX = mrvs.second;	//принимаем значения из функции 
-	if (tmpY == 32767 && tmpX == 32767) { game = false; }//Если по Y = 32767 и X = 32767 то выход из пролграммы по ESCAPE
+	if (tmpVspomogatelnaya == 32767) { game = false; }//Если по Y = 32767 и X = 32767 то выход из пролграммы по ESCAPE
 	else {//Продолжаем если не ESCAPE
-		if (tmpY == 16382 && tmpX == 16382) {//если нажали пробел смена хода между белыми и чёрными шашками
-			tmpY = tmpOldY; tmpX = tmpOldX; old_shag = 0; new_shag = -1;
-			//hod = ((hod) ? false : true); tmpY = 0; tmpX = 0;
+		if (tmpVspomogatelnaya == 16382) {tmpVspomogatelnaya = 0;//если нажали пробел смена хода между белыми и чёрными шашками
+		bool_probel = false;//нужен для того что бы при передаче хода код обходил выбор шашки в которой клетке стоит курсор
+		old_shag = 0; new_shag = -1;
+			hod = ((hod) ? false : true); //tmpY = tmpOldY; tmpX = tmpOldX;
+
 		}
-		if (old_bool && peremeshenie) { //выбор ячейки. если не ESCAPE продолжаем дальше
-			if (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {//0 - пустая ячейка. 8 - белая ячейка
-				old_shag = 0; new_shag = -1;// если ячейка пустая то ошибка
-				//old_bool = false;  
+		if(bool_probel){//если нажали пробел(передача хода) то в этот блок не заходим на этой итерации
+			if (old_bool && peremeshenie) { //выбор ячейки. если не ESCAPE продолжаем дальше
+				if (shashki[tmpY][tmpX] == 0 || shashki[tmpY][tmpX] == 8) {//0 - пустая ячейка. 8 - белая ячейка
+					old_shag = 0; new_shag = -1;// если ячейка пустая то ошибка
+					//old_bool = false;  
+				}
+				else {//ЗАХВАТ
+					if (shashki[tmpY][tmpX] != 0) {//тут выбираем ячейку.Если ячейка нулевая захват не получится
+						old_shag = shashki[tmpY][tmpX]; //выбор ячейки
+						tmpYold = tmpY; tmpXold = tmpX;
+						old_bool = false;
+					}
+				}
 			}
-			else {//ЗАХВАТ
-				if (shashki[tmpY][tmpX] != 0) {//тут выбираем ячейку.Если ячейка нулевая захват не получится
-					old_shag = shashki[tmpY][tmpX]; //выбор ячейки
-					tmpYold = tmpY; tmpXold = tmpX;
-					old_bool = false;
+			else { //Если после захвата шашки нажать на ту же шашку то захват снимется
+				if (!old_bool && tmpY == tmpYold && tmpX == tmpXold) {
+					old_shag = 0; new_shag = -1; tmpYold = 0; tmpXold = 0; old_bool = true;
 				}
 			}
 		}
-		else { //Если после захвата шашки нажать на ту же шашку то захват снимется
-			if (!old_bool && tmpY == tmpYold && tmpX == tmpXold) {
-				old_shag = 0; new_shag = -1; tmpYold = 0; tmpXold = 0; old_bool = true;
-			}
-		}
-
+		bool_probel = true;
 		if (shashki[tmpY][tmpX] == 0) { new_shag = shashki[tmpY][tmpX]; old_bool = true; } //перенос ячейки
 		else { new_shag = -1; }//Если клетка занята то ни чего не делаем
 		if (old_shag != new_shag && new_shag == 0) {
@@ -301,7 +208,7 @@ do {
 						shashki[tmpYold][tmpXold] = 0;
 						shashki[tmpY][tmpX] = old_shag;
 						print(output, 0, 68, "                                    "); cout << endl;
-						hod = ((hod) ? false : true); tmpY = 0; tmpX = 0;//смена хода
+						hod = ((hod) ? false : true); //tmpY = 0; tmpX = 0;//смена хода
 					}
 					else { print(output, 0, 68, "Error: шашки не ходят назад                "); cout << endl; }//если ход был неправильный. выводим сообщение
 				}
@@ -309,9 +216,9 @@ do {
 			if (old_shag == 3 || old_shag == 4) {//для дамок
 				//proverka_X = tmpX - tmpXold;
 				//proverka_Y = tmpY - tmpYold;
-				if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||//если шашка сделала ход в какую либо сторону на 2 клетки
-					(proverka_Y == 2 && proverka_X == -2) || (proverka_Y == -2 && proverka_X == -2))
-				{
+				//if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||//если шашка сделала ход в какую либо сторону на 2 клетки
+				//	(proverka_Y == 2 && proverka_X == -2) || (proverka_Y == -2 && proverka_X == -2))
+				//{
 					(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
 					(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
 
@@ -319,7 +226,7 @@ do {
 						shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
 						peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
 					}
-				}
+				//}
 
 
 
@@ -336,7 +243,7 @@ do {
 			//else if (proverka_Y > 0 && proverka_X > 0) { cout << "низ правово                   ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
 			//else if (proverka_Y > 0 && proverka_X < 0) { cout << "низ лево                      ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
 			
-			SetConsoleCursorPosition(output, { 0, 64 });
+			SetConsoleCursorPosition(output, { 0, 65 });
 			cout << "Y" << "        " << "X" << endl;
 			cout << tmpYold << "        " << tmpXold << "        " << "Захват" << endl;
 			cout << tmpY << "        " << tmpX << "        " << "Перенос" << endl;
@@ -368,8 +275,7 @@ void print(HANDLE output,short x,short y,string stroka) {
 	SetConsoleCursorPosition(output, { x, y });
 	cout << stroka;
 }
-//pair<short, short> 
-void arrow(HANDLE output, short& y, short& x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy) {
+void arrow(HANDLE output, short& y, short& x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy,int& tmpVspomogatelnaya) {
 	//функция перемещает курсор по таблице и при нажатии ENTER возвращает позицию выбраной ячейки,принимает старое значение позиции что-бы курсор оставался в той же позиции
 	//так же принимает размеры столбцов и ячеек,нулевые позиции по X и Y,и шаг перемещения по X и Y
 	//  //int row = 8;//X 
@@ -393,14 +299,13 @@ void arrow(HANDLE output, short& y, short& x, const int row, const int column, c
 		case DOWN_ARROW:	y++; yy += step_yy; if (y == column) { y = 0;	       yy = zerro_pos_yy; }					break;//down
 		case LEFT_ARROW:	x--; xx -= step_xx; if (x == -1)     { x = row - 1;	   xx = (x * step_xx) + zerro_pos_xx; }	break;//left
 		case RIGHT_ARROW:	x++; xx += step_xx; if (x == row)    { x = 0;	       xx = zerro_pos_xx; }				    break;//right
-		case ESCAPE: x = 32767; y = 32767; break;
-		case SPACE:  x = 16382; y = 16382; break;
+		case ESCAPE: tmpVspomogatelnaya = 32767; break;
+		case SPACE:  tmpVspomogatelnaya = 16382; break;
 		case 224:break;
 		default: break;
 		}
 		SetConsoleCursorPosition(output, { xx, yy }); //перемещаем курсор при нажатиях стрелок на клавиатуре
 	}
-	//return make_pair(y, x);
 }
 
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole) {
