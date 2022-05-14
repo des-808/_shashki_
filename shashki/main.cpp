@@ -178,7 +178,8 @@ do {
 			if (old_shag == 2 && tmpY == 0) { old_shag = 4; }//Если чёрная шака дошла до противоположного конца поля она становится чёрной дамкой
 			
 			peremeshenie = true;
-			if(old_shag == 1||old_shag == 2){//для обычных шашек
+			if (old_shag == 1 || old_shag == 2)//для обычных шашек
+				{
 				if (proverka_Y > 1 || proverka_X > 1 || proverka_Y < -1 || proverka_X < -1) {
 					peremeshenie = false;
 					if ((proverka_Y == 2 && proverka_X == 2) || (proverka_Y == -2 && proverka_X == 2) ||//если шашка сделала ход в какую либо сторону на 2 клетки
@@ -193,9 +194,9 @@ do {
 							SetConsoleCursorPosition(output, { 0, 69 });
 							smena_hoda = true;
 							if (hod) {//true ход белых проверяем чёрные по соседству
-								if (((shashki[tmpY + 1 ][tmpX +  1] == 2) || (shashki[tmpY +  1][tmpX +  1] == 4)) && (shashki[tmpY +  2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
+								if (((shashki[tmpY +  1][tmpX +  1] == 2) || (shashki[tmpY +  1][tmpX +  1] == 4)) && (shashki[tmpY +  2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
 								if (((shashki[tmpY + -1][tmpX +  1] == 2) || (shashki[tmpY + -1][tmpX +  1] == 4)) && (shashki[tmpY + -2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
-								if (((shashki[tmpY + 1 ][tmpX + -1] == 2) || (shashki[tmpY +  1][tmpX + -1] == 4)) && (shashki[tmpY +  2][tmpX + -2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
+								if (((shashki[tmpY +  1][tmpX + -1] == 2) || (shashki[tmpY +  1][tmpX + -1] == 4)) && (shashki[tmpY +  2][tmpX + -2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
 								if (((shashki[tmpY + -1][tmpX + -1] == 2) || (shashki[tmpY + -1][tmpX + -1] == 4)) && (shashki[tmpY + -2][tmpX + -2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
 							}
 							else {//false чод чёрных проверяем белые по соседству
@@ -230,77 +231,66 @@ do {
 					else { print(output, 0, 68, "Error: шашки не ходят назад                "); cout << endl; }//если ход был неправильный. выводим сообщение
 				}
 			}
-			if (old_shag == 3 || old_shag == 4) {//для дамок
+			
+			if (old_shag == 3 || old_shag == 4) //для дамок
+				{
 				SetConsoleCursorPosition(output, { 0, 65 });
 				stepperX = (tmpX > tmpXold) ? tmpX - tmpXold : tmpXold - tmpX;
 				stepperY = (tmpY > tmpYold) ? tmpY - tmpYold : tmpYold - tmpY;
-				if (proverka_Y < 0 && proverka_X > 0) {
-					for(int i = 0;i<stepperX;i++){
-						//if () {}
-						proverka_kletok(proverka_Y, proverka_X);
-						cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
+				if (stepperX == stepperY) {//проверка на корректность хода дамки. Если stepperX != stepperY то ход был не по диагонали
+					SetConsoleCursorPosition(output, { 0, 66 });
+					if (proverka_Y < 0 && proverka_X > 0) {//Верх право
+						for(int i = 0;i<stepperX;i++){
+							//if () {}
+							proverka_kletok(proverka_Y, proverka_X);
+							cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
+						}
+					 }
+					if (proverka_Y < 0 && proverka_X < 0) {//Верх лево
+						for(int i = 0;i<stepperX;i++){
+							if	    ((shashki[tmpYold - i][tmpXold - i] == 0)) {											 cout << "Пустая клетка |"; }
+							else if ((shashki[tmpYold - i][tmpXold - i] == 1) || (shashki[tmpYold + i][tmpXold + i] == 3)) { cout << "Белые         |"; }
+							else if ((shashki[tmpYold - i][tmpXold - i] == 2) || (shashki[tmpYold + i][tmpXold + i] == 4)) { cout << "Чёрные        |"; }
+							//else if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
+							//proverka_kletok(proverka_Y, proverka_X);
+							(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+							(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
+							//cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
+						}
+						//cout << "верх лево                     ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ 
 					}
-
-				 }
-				if (proverka_Y < 0 && proverka_X < 0) { 
-					
-					for(int i = 0;i<stepperX;i++){
-						if	    ((shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0)) {																 cout << "Пустая клетка |"; }
-						else if ((shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 1) || (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 3)) { cout << "Белые         |"; }
-						else if ((shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 2) || (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 4)) { cout << "Чёрные        |"; }
-						//else if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
-						//proverka_kletok(proverka_Y, proverka_X);
-						(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
-						(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
-						//cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
+					if (proverka_Y > 0 && proverka_X > 0) { cout << "низ правово                   ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
+					if (proverka_Y > 0 && proverka_X < 0) { cout << "низ лево                      ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
+					//proverka_kletok(proverka_Y, proverka_X);//вычисляем псевдо адрес промежуточной клетки
+						//(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+						//(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
+						if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
+							shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
+							peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
+						}
+					//}
+					shashki[tmpYold][tmpXold] = 0;
+					shashki[tmpY][tmpX] = old_shag;
+					print(output, 0, 68, "                                                  "); cout << endl;
 					}
-					
-					
-					
-					//cout << "верх лево                     ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ 
+				else {
+					cout << "Дамки так не ходят "; peremeshenie = false;
 				}
-				if (proverka_Y > 0 && proverka_X > 0) { cout << "низ правово                   ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
-				if (proverka_Y > 0 && proverka_X < 0) { cout << "низ лево                      ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
-				
-
-				//proverka_kletok(proverka_Y, proverka_X);//вычисляем псевдо адрес промежуточной клетки
-
-					//(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
-					//(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
-
-					if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
-						shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
-						peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
-					}
-				//}
-
-				shashki[tmpYold][tmpXold] = 0;
-				shashki[tmpY][tmpX] = old_shag;
-				print(output, 0, 68, "                                                  "); cout << endl;
 			}
+
 			//if (old_shag == 1 && tmpY == 7) { old_shag = 3; }//Если белая шака дошла до противоположного конца поля она становится белой дамкой
 			//if (old_shag == 2 && tmpY == 0) { old_shag = 4; }//Если чёрная шака дошла до противоположного конца поля она становится чёрной дамкой
-			//
-			
-			
-			SetConsoleCursorPosition(output, { 0, 66 });
+			SetConsoleCursorPosition(output, { 0, 67 });
 			cout << setw(3) << "Y" << "        " << "X" << endl;
 			cout << setw(3) << tmpYold << "        " << tmpXold << "        " << "Захват" << endl;
 			cout << setw(3) << tmpY << "        " << tmpX << "        " << "Перенос" << endl;
 			cout << setw(3) << tmpY - tmpYold << "        " << tmpX - tmpXold << "        "<<endl;
 			cout << setw(3) << tmpYold - tmpY << "        " << tmpXold - tmpX << "        " << endl;
 			cout << setw(3) << stepperY << "        " << stepperX << "        " << endl;
-			
 		}
-
 	}
-
-	/*setlocale(LC_ALL, "Russian");
-	SetConsoleCursorPosition(output, { 0, 64 });
-	cout << endl << tmpY << TAB << tmpX;*/
-
-
 } while (game);
+
 SetConsoleCursorPosition(output, { 0, 65 });
 cout << "                                    THE END                                    " << endl;
 cout << "                                                                               " << endl;
