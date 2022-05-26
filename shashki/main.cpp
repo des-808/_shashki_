@@ -36,12 +36,15 @@ void print(int i, int SIZE, char ch0, char ch1);
 void print(HANDLE output, short x, short y, string s); 
 void arrow(HANDLE output, short& y, short& x, const int row, const int column, const int zerro_pos_xx, const int zerro_pos_yy, const int step_xx, const int step_yy,int& tmpVspomogatelnaya);
 template<typename T>void proverka_kletok(T& proverka_Y, T& proverka_X);
+short proverka_kletok_X(short proverka_X);
+short proverka_kletok_Y(short proverka_Y);
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole);
+void print_step(HANDLE output, short tmpYold, short tmpXold, short tmpY, short tmpX, short stepperY, short stepperX);
 
 int main(void) {
 	setlocale(LC_ALL, "Russian");
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-//CONSOLE_FONT_INFOEX fontInfo;
+CONSOLE_FONT_INFOEX fontInfo;
 short tmpX, tmpY, tmpOldX, tmpOldY, tmpXold, tmpYold, count;
 tmpX = tmpY = tmpOldX = tmpOldY = tmpXold = tmpYold = count = 0;
 bool game = true;
@@ -53,11 +56,11 @@ bool old_bool = true;
 int temp = 0;
 int tmpVspomogatelnaya = 0;//через эту переменную будут передаваться комманды SPACE,или ESCAPE и возможно что-то ещё
 int mask, simvol, outs;
-bool smena_hoda = true;
+bool smena_hoda = false;// true;
 int stepperX, stepperY;//сделал для просчета клеток для хода дамок
 stepperX = stepperY = 0;
 #include"massivy.h"
-//int shashki[8][8]{  {8,1,8,1,8,1,8,1},
+//int shashki[8][8]{{8,1,8,1,8,1,8,1},
 //					{1,8,1,8,1,8,1,8},
 //					{8,1,8,1,8,1,8,1},
 //					{0,8,0,8,0,8,0,8},
@@ -65,22 +68,22 @@ stepperX = stepperY = 0;
 //					{2,8,2,8,2,8,2,8},
 //					{8,2,8,2,8,2,8,2},
 //					{2,8,2,8,2,8,2,8} };//стартовая таблица;
-int shashki[8][8]{  {8,1,8,1,8,1,8,1},
-					{0,8,1,8,0,8,1,8},
-					{8,2,8,1,8,1,8,1},
-					{0,8,0,8,0,8,0,8},
+int shashki[8][8]{  {8,4,8,1,8,1,8,1},
+					{3,8,0,8,0,8,1,8},
+					{8,0,8,1,8,1,8,1},
+					{0,8,2,8,0,8,0,8},
 					{8,2,8,2,8,1,8,0},
-					{2,8,0,8,0,8,2,8},
-					{8,2,8,2,8,2,8,2},
-					{2,8,2,8,2,8,3,8} };//стартовая таблица;
+					{3,8,0,8,0,8,0,8},
+					{8,0,8,2,8,2,8,2},
+					{2,8,0,8,2,8,0,8} };//стартовая таблица;
 
 HANDLE output;
 output = GetStdHandle(STD_OUTPUT_HANDLE);
 
 do {
 	setlocale(LC_ALL, "Russian");
-	if (hod) { print(output, 0, 0, "                                                           ХОДЯТ БЕЛЫЕ ШАШКИ     ");  }//tmpY = 0; tmpX = 0;
-	else{	   print(output, 0, 0, "                                                           ХОДЯТ ЧЁРНЫЕ ШАШКИ    ");  }//tmpY = 7; tmpX = 0;
+	if (hod) { print(output, 0, 0, "                                                           ХОДЯТ БЕЛЫЕ ШАШКИ     ");  }
+	else{	   print(output, 0, 0, "                                                           ХОДЯТ ЧЁРНЫЕ ШАШКИ    ");  }
 	
 	setlocale(LC_ALL, "C");
 	SetConsoleCursorPosition(output, { 0, 1 });//для построения таблицы курсор устанавливаем в положение 0.1
@@ -158,6 +161,7 @@ do {
 						old_shag = shashki[tmpY][tmpX]; //выбор ячейки
 						tmpYold = tmpY; tmpXold = tmpX;
 						old_bool = false;
+						print_step(output, tmpYold, tmpXold, tmpY, tmpX, stepperY, stepperX);
 					}
 				}
 			}
@@ -191,7 +195,7 @@ do {
 
 						if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
 							shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
-							SetConsoleCursorPosition(output, { 0, 69 });
+							SetConsoleCursorPosition(output, { 129, 9 });
 							smena_hoda = true;
 							if (hod) {//true ход белых проверяем чёрные по соседству
 								if (((shashki[tmpY +  1][tmpX +  1] == 2) || (shashki[tmpY +  1][tmpX +  1] == 4)) && (shashki[tmpY +  2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
@@ -213,10 +217,10 @@ do {
 					shashki[tmpYold][tmpXold] = 0;
 					shashki[tmpY][tmpX] = old_shag;
 					if (smena_hoda) { hod = ((hod) ? false : true); }
-					print(output, 0, 68, "                                              "); cout << endl;
+					print(output, 129, 9, "                                              "); cout << endl;
 					
 					}
-					else { print(output, 0, 68, "Error: шашки могут бить только через клетку  "); cout << endl; }
+					else { print(output, 129, 9, "Error: шашки могут бить только через клетку  "); cout << endl; }
 				}
 				else {//если шашка просто делает ход проверяем что она не ходит назад
 					peremeshenie = false;//устанавливаем переменныю разрешение в false. если будет правильный ход то переменная поменяется на true
@@ -228,53 +232,130 @@ do {
 						print(output, 0, 68, "                                    "); cout << endl;
 						hod = ((hod) ? false : true); //tmpY = 0; tmpX = 0;//смена хода
 					}
-					else { print(output, 0, 68, "Error: шашки не ходят назад                "); cout << endl; }//если ход был неправильный. выводим сообщение
+					else { print(output, 129, 9, "Error: шашки не ходят назад                "); cout << endl; }//если ход был неправильный. выводим сообщение
 				}
 			}
 			
 			if (old_shag == 3 || old_shag == 4) //для дамок
 				{
-				SetConsoleCursorPosition(output, { 0, 65 });
+				SetConsoleCursorPosition(output, { 128, 10 });
 				stepperX = (tmpX > tmpXold) ? tmpX - tmpXold : tmpXold - tmpX;
 				stepperY = (tmpY > tmpYold) ? tmpY - tmpYold : tmpYold - tmpY;
 				if (stepperX == stepperY) {//проверка на корректность хода дамки. Если stepperX != stepperY то ход был не по диагонали и мы ни чего не делаем
-					SetConsoleCursorPosition(output, { 0, 66 });
+					int* arrHod = new int[stepperX + 1]{};
 					if (proverka_Y < 0 && proverka_X > 0) {//Верх право
-						for(int i = 0;i<stepperX;i++){
-							//if () {}
-							proverka_kletok(proverka_Y, proverka_X);
-							cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
+						for (int i = 0; i <= stepperX; i++) {
+							arrHod[i] = shashki[tmpYold - i][tmpXold + i];
 						}
-					 }
-					if (proverka_Y < 0 && proverka_X < 0) {//Верх лево
-						for (int i = 1; i < stepperX; i++) {
-							if	    ((shashki[tmpYold - i][tmpXold - i] == 0)) {											 cout << "Пустая клетка |"; }
-							else if ((shashki[tmpYold - i][tmpXold - i] == 1) || (shashki[tmpYold + i][tmpXold + i] == 3)) { cout << "Белые         |"; }
-							else if ((shashki[tmpYold - i][tmpXold - i] == 2) || (shashki[tmpYold + i][tmpXold + i] == 4)) { cout << "Чёрные        |"; }
-							//else if (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] == 0) {}
-							//proverka_kletok(proverka_Y, proverka_X);
-							(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
-							(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
-							//cout << shashki[tmpYold + proverka_Y][tmpXold + proverka_X] << "|";
-						}
-						//cout << "верх лево                     ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ 
 					}
-					if (proverka_Y > 0 && proverka_X > 0) { cout << "низ правово                   ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
-					if (proverka_Y > 0 && proverka_X < 0) { cout << "низ лево                      ";/*shashki[tmpYold][tmpXold] = 0; shashki[tmpY][tmpX] = old_shag;*/ }
-					//proverka_kletok(proverka_Y, proverka_X);//вычисляем псевдо адрес промежуточной клетки
-						//(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
-						//(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
-					//for (int i = 1;i<stepperX;i+=2) {
-						if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) != 0) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
-							shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
-							peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
+					else if (proverka_Y < 0 && proverka_X < 0) {//Верх лево
+						for (int i = 0; i <= stepperX; i++) {
+							arrHod[i] = shashki[tmpYold - i][tmpXold - i];
 						}
-					//}
-					//}
-					shashki[tmpYold][tmpXold] = 0;
-					shashki[tmpY][tmpX] = old_shag;
-					print(output, 0, 68, "                                                  "); cout << endl;
 					}
+					else if (proverka_Y > 0 && proverka_X > 0) {//низ правово 
+						for (int i = 0; i <= stepperX; i++) {
+							arrHod[i] = shashki[tmpYold + i][tmpXold + i];
+						}
+					}
+					else if (proverka_Y > 0 && proverka_X < 0) {//низ лево  
+						for (int i = 0; i <= stepperX; i++) {
+							arrHod[i] = shashki[tmpYold + i][tmpXold - i];
+							//cout << arrHod[i] << "|";
+						}//cout <<  "                             ";
+					}
+					//true-ходят белые. false-ходят чёрные
+					/*for(int i = 1;i <= stepperX;i++){cout << arrHod[i] << "|";}cout << "                             ";*/
+					SetConsoleCursorPosition(output, { 128, 11 });
+					bool svoi = false;
+					bool vrazjeskiye = false;
+					bool pustay_kletka = false;
+					bool povtor = false;
+					int count = 0;
+					if (hod) {
+						for (int i = 1; i <= stepperX; i++) {
+							svoi = true;
+							if (arrHod[i] == 0) {pustay_kletka = true;
+								count++;
+							}
+							else if ((arrHod[i] == 1 || arrHod[i] == 3)) {
+									if(i == stepperX) {
+										if ((arrHod[i] == 1 || arrHod[i] == 3)) { povtor = true; }
+									}else {
+										if ((arrHod[i + 1] != 0 || arrHod[i + 1] != 0)) { povtor = true; }
+									}
+								svoi = true;
+								}
+								else if ((arrHod[i] == 2 || arrHod[i] == 4)) {
+									if ((arrHod[i + 1] != 0 || arrHod[i + 1] != 0)) { povtor = true; }
+									//vrazjeskiye = true;
+								}
+						}
+					}
+					else {
+						for (int i = 1; i <= stepperX; i++) {
+							if (arrHod[i] == 0) {
+								count++;
+								pustay_kletka = true;
+							}
+							if ((arrHod[i] == 1 || arrHod[i] == 3)) {
+								if (i == stepperX){
+									if ((arrHod[i] == 1 || arrHod[i] == 3)) { povtor = true; }
+								}
+								else {
+									if ((arrHod[i + 1] != 0 || arrHod[i + 1] != 0)) { povtor = true; }
+								}
+								svoi = true;
+							}
+							if ((arrHod[i] == 2 || arrHod[i] == 4)) {
+								if ((arrHod[i + 1] != 0 || arrHod[i + 1] != 0)) { povtor = true; }
+								//vrazjeskiye = true;
+							}
+
+						}
+					}
+					if (!svoi) { cout << "недопустимый ход!! svoi"; }
+					else {
+						if (povtor) {
+							cout << "недопустимый ход!! povtor";
+							svoi = false; pustay_kletka = false; vrazjeskiye = false; povtor = false;
+						}
+						else {
+							//if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] != 0)) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
+							//	if ((shashki[tmpYold + proverka_Y + proverka_kletok_Y(proverka_Y)][tmpXold + proverka_X + proverka_kletok_X(proverka_X)] != old_shag)) {
+							//		shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
+							//		peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
+							//		shashki[tmpY][tmpX] = old_shag;
+							//	}
+							//}
+							if (peremeshenie) {
+								
+								
+								if (stepperX != 1) {
+									for (int i = 0; i < stepperX; i++) {
+										proverka_kletok(proverka_Y, proverka_X);
+
+										if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] != 0)) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
+											if ((shashki[tmpYold + proverka_Y + proverka_kletok_Y(proverka_Y)][tmpXold + proverka_X + proverka_kletok_X(proverka_X)] != old_shag)) {
+												shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
+												peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
+												shashki[tmpY][tmpX] = old_shag;
+											}
+										}
+										//else { print(output, 129, 9, "                    XZXZXZXZXZXZXZ                              "); cout << endl; }
+									}shashki[tmpYold][tmpXold] = 0;
+									if(count == stepperX){ shashki[tmpY][tmpX] = old_shag; }
+								}
+								else {
+									shashki[tmpYold][tmpXold] = 0;
+									shashki[tmpY][tmpX] = old_shag;
+								}
+
+							}
+						}
+						delete[] arrHod;
+					}
+				}
 				else {
 					cout << "Дамки так не ходят "; peremeshenie = false;
 				}
@@ -282,13 +363,7 @@ do {
 
 			//if (old_shag == 1 && tmpY == 7) { old_shag = 3; }//Если белая шака дошла до противоположного конца поля она становится белой дамкой
 			//if (old_shag == 2 && tmpY == 0) { old_shag = 4; }//Если чёрная шака дошла до противоположного конца поля она становится чёрной дамкой
-			/*SetConsoleCursorPosition(output, { 0, 67 });
-			cout << setw(3) << "Y" << "        " << "X" << endl;
-			cout << setw(3) << tmpYold << "        " << tmpXold << "        " << "Захват" << endl;
-			cout << setw(3) << tmpY << "        " << tmpX << "        " << "Перенос" << endl;
-			cout << setw(3) << tmpY - tmpYold << "        " << tmpX - tmpXold << "        "<<endl;
-			cout << setw(3) << tmpYold - tmpY << "        " << tmpXold - tmpX << "        " << endl;
-			cout << setw(3) << stepperY << "        " << stepperX << "        " << endl;*/
+			print_step(output, tmpYold, tmpXold, tmpY, tmpX, stepperY, stepperX);
 		}
 	}
 } while (game);
@@ -329,6 +404,9 @@ void arrow(HANDLE output, short& y, short& x, const int row, const int column, c
 	SetConsoleCursorPosition(output, { xx, yy });//выводим курсор по координатам YY и XX
 	while (l != ENTER && l != ESCAPE && l != SPACE) {
 		l = _getch();
+		print(output, 128, 9,  "                                                      ");
+		print(output, 128, 10, "                                                      ");
+		print(output, 128, 11, "                                                      ");
 		switch (l) {
 		case UP_ARROW:		y--; yy -= step_yy; if (y == -1)     { y = column - 1; yy = (y * step_yy) + zerro_pos_yy; }	break;//up 
 		case DOWN_ARROW:	y++; yy += step_yy; if (y == column) { y = 0;	       yy = zerro_pos_yy; }					break;//down
@@ -337,7 +415,7 @@ void arrow(HANDLE output, short& y, short& x, const int row, const int column, c
 		case ESCAPE: tmpVspomogatelnaya = 32767; break;
 		case SPACE:  tmpVspomogatelnaya = 16382; break;
 		case 224:break;
-		default: break;
+		default:  break;
 		}
 		SetConsoleCursorPosition(output, { xx, yy }); //перемещаем курсор при нажатиях стрелок на клавиатуре
 	}
@@ -346,10 +424,27 @@ template<typename T>void proverka_kletok(T& proverka_Y,T& proverka_X){
 (proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
 (proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
 }
+short proverka_kletok_X( short proverka_X) {
+	(proverka_X > 0) ? proverka_X -= 1 : proverka_X += 1;//вычисляем псевдо адрес промежуточной клетки
+	return proverka_X;
+}
+short proverka_kletok_Y(short proverka_Y) {
+	(proverka_Y > 0) ? proverka_Y -= 1 : proverka_Y += 1;//вычисляем псевдо адрес промежуточной клетки
+	return proverka_Y;
+}
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole) {
 	fontInfo.cbSize = sizeof(fontInfo);
 	GetCurrentConsoleFontEx(hConsole, TRUE, &fontInfo);
 	//wcscpy(fontInfo.FaceName, L"Lucida Console");
 	fontInfo.dwFontSize.Y = L;
 	SetCurrentConsoleFontEx(hConsole, TRUE, &fontInfo);
+}
+
+void print_step(HANDLE output, short tmpYold, short tmpXold, short tmpY, short tmpX, short stepperY, short stepperX) {
+	SetConsoleCursorPosition(output, { 128, 3 }); cout << setw(3) << "Y"            << "\t" << "X" << endl;
+	SetConsoleCursorPosition(output, { 128, 4 }); cout << setw(3) << tmpYold        << "\t" << tmpXold        << "        " << "Захват" << endl;
+	SetConsoleCursorPosition(output, { 128, 5 }); cout << setw(3) << tmpY           << "\t" << tmpX           << "        " << "Перенос" << endl;
+	SetConsoleCursorPosition(output, { 128, 6 }); cout << setw(3) << tmpY - tmpYold << "\t" << tmpX - tmpXold << "        " << endl;
+	SetConsoleCursorPosition(output, { 128, 7 }); cout << setw(3) << tmpYold - tmpY << "\t" << tmpXold - tmpX << "        " << endl;
+	SetConsoleCursorPosition(output, { 128, 8 }); cout << setw(3) << stepperY       << "\t" << stepperX       << "        " << endl;
 }
