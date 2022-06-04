@@ -40,6 +40,7 @@ short proverka_kletok_X(short proverka_X);
 short proverka_kletok_Y(short proverka_Y);
 void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole);
 void print_step(HANDLE output, short tmpYold, short tmpXold, short tmpY, short tmpX, short stepperY, short stepperX);
+void proverka_hoda(bool hod,int*& arrHod, short stepperX, int& pustay_kletka_count, int& vrazjeskiye, bool& povtor, int& svoi);
 
 int main(void) {
 	setlocale(LC_ALL, "Russian");
@@ -243,7 +244,7 @@ do {
 				stepperY = (tmpY > tmpYold) ? tmpY - tmpYold : tmpYold - tmpY;
 				if (stepperX == stepperY) {//проверка на корректность хода дамки. Если stepperX != stepperY то ход был не по диагонали и мы ни чего не делаем
 					int* arrHod = new int[stepperX + 1]{};
-					if (proverka_Y < 0 && proverka_X > 0) {//Верх право
+					if      (proverka_Y < 0 && proverka_X > 0) {//Верх право
 						for (int i = 0; i <= stepperX; i++) {
 							arrHod[i] = shashki[tmpYold - i][tmpXold + i];
 						}
@@ -273,35 +274,11 @@ do {
 					int vrazjeskiye_black = 0;
 					int pustay_kletka_count = 0;
 					bool povtor = false;
-					//int count = 0;
 					if (hod) {//true  = белые
-						for (int i = 1; i <= stepperX; i++) {
-							if (arrHod[i] == 0) {pustay_kletka_count++; 
-							}
-							else {
-								if ((arrHod[i] == 2) || (arrHod[i] == 4)) { vrazjeskiye_black++; 
-									if ((arrHod[i + 1] != 0) && i < stepperX - 1) { povtor = true; }
-									if (i == stepperX) {
-										if ((arrHod[i] == 1 || arrHod[i] == 3)) { povtor = true; }
-									}else {
-										if ((arrHod[i + 1] != 0) && i < 8) { povtor = true; }
-									}
-								
-								}
-								if ((arrHod[i] == 1) || (arrHod[i] == 3)) { svoi_white++;
-									if ((arrHod[i + 1] != 0 ) && i < stepperX-1) { povtor = true; }
-									if (i == stepperX) {
-										if ((arrHod[i] == 1 || arrHod[i] == 3)) { povtor = true; }
-									}
-									else {
-										if ((arrHod[i + 1] != 0 ) && i < 8) { povtor = true; }
-									}
-								}
-							}
-						}
-					}
-					else {
-						for (int i = 1; i <= stepperX; i++) {
+						proverka_hoda(hod,arrHod, stepperX, pustay_kletka_count, vrazjeskiye_black, povtor, svoi_white);
+					}else {//false  = чёрные
+						proverka_hoda(hod,arrHod, stepperX, pustay_kletka_count, vrazjeskiye_white, povtor, svoi_black);
+						/*for (int i = 1; i <= stepperX; i++) {
 							if (arrHod[i] == 0) { pustay_kletka_count++;
 							}else{
 								if ((arrHod[i] == 1) || (arrHod[i] == 3)) { vrazjeskiye_white++; 
@@ -323,29 +300,20 @@ do {
 									}
 								}
 						    }
-						}
+						}*/
 					}
-					//if () {}
-					if (svoi_white || svoi_black ) { cout << "недопустимый ход!! svoi"; new_shag = -1; old_bool = false;
+					if (svoi_white || svoi_black ) { cout << "недопустимый ход!! svoi";
+						svoi_white = 0; svoi_black = 0; pustay_kletka_count = 0; vrazjeskiye_white = 0; vrazjeskiye_black = 0; povtor = false; new_shag = -1; old_bool = false;
 					}
 					else {
-						if (povtor) {
-							cout << "недопустимый ход!! povtor";
-							svoi_white = 0;svoi_black = 0; pustay_kletka_count = 0; vrazjeskiye_white = 0; vrazjeskiye_black = 0; povtor = false; new_shag = -1; old_bool = false;
+						if (povtor) {cout << "недопустимый ход!! povtor";
+						svoi_white = 0; svoi_black = 0; pustay_kletka_count = 0; vrazjeskiye_white = 0; vrazjeskiye_black = 0; povtor = false; new_shag = -1; old_bool = false;
 						}
 						else {
-							//if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] != 0)) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
-							//	if ((shashki[tmpYold + proverka_Y + proverka_kletok_Y(proverka_Y)][tmpXold + proverka_X + proverka_kletok_X(proverka_X)] != old_shag)) {
-							//		shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
-							//		peremeshenie = true;//разрешаем перемещение выбранной шашки на новое место
-							//		shashki[tmpY][tmpX] = old_shag;
-							//	}
-							//}
 							if (peremeshenie) {
 								if (stepperX != 1) {
 									for (int i = 0; i < stepperX; i++) {
 										proverka_kletok(proverka_Y, proverka_X);
-
 										//if ((old_shag != shashki[tmpYold + proverka_Y][tmpXold + proverka_X]) && (shashki[tmpYold + proverka_Y][tmpXold + proverka_X] != 0)) {//проверяем что в промежуточной клетке находится вражеская шашка и промежуточная клетка не является пустой
 											if ((shashki[tmpYold + proverka_Y + proverka_kletok_Y(proverka_Y)][tmpXold + proverka_X + proverka_kletok_X(proverka_X)] != old_shag)) {
 												shashki[tmpYold + proverka_Y][tmpXold + proverka_X] = 0;//убираем вражескую шашку
@@ -353,8 +321,6 @@ do {
 												shashki[tmpY][tmpX] = old_shag;
 											}
 										//}
-										//else { print(output, 129, 9, "                    XZXZXZXZXZXZXZ                              "); cout << endl; }
-
 									}shashki[tmpYold][tmpXold] = 0;
 									if(count == stepperX){ shashki[tmpY][tmpX] = old_shag; }
 								}
@@ -372,7 +338,6 @@ do {
 					cout << "Дамки так не ходят "; peremeshenie = false;
 				}
 			}
-
 			//if (old_shag == 1 && tmpY == 7) { old_shag = 3; }//Если белая шака дошла до противоположного конца поля она становится белой дамкой
 			//if (old_shag == 2 && tmpY == 0) { old_shag = 4; }//Если чёрная шака дошла до противоположного конца поля она становится чёрной дамкой
 			print_step(output, tmpYold, tmpXold, tmpY, tmpX, stepperY, stepperX);
@@ -451,7 +416,6 @@ void fontSizeConsole(int L, CONSOLE_FONT_INFOEX fontInfo, HANDLE hConsole) {
 	fontInfo.dwFontSize.Y = L;
 	SetCurrentConsoleFontEx(hConsole, TRUE, &fontInfo);
 }
-
 void print_step(HANDLE output, short tmpYold, short tmpXold, short tmpY, short tmpX, short stepperY, short stepperX) {
 	SetConsoleCursorPosition(output, { 128, 3 }); cout << setw(3) << "Y"            << "\t" << "X" << endl;
 	SetConsoleCursorPosition(output, { 128, 4 }); cout << setw(3) << tmpYold        << "\t" << tmpXold        << "        " << "Захват" << endl;
@@ -459,4 +423,35 @@ void print_step(HANDLE output, short tmpYold, short tmpXold, short tmpY, short t
 	SetConsoleCursorPosition(output, { 128, 6 }); cout << setw(3) << tmpY - tmpYold << "\t" << tmpX - tmpXold << "        " << endl;
 	SetConsoleCursorPosition(output, { 128, 7 }); cout << setw(3) << tmpYold - tmpY << "\t" << tmpXold - tmpX << "        " << endl;
 	SetConsoleCursorPosition(output, { 128, 8 }); cout << setw(3) << stepperY       << "\t" << stepperX       << "        " << endl;
+}
+void proverka_hoda(bool hod,int*& arrHod, short stepperX, int& pustay_kletka_count,int& vrazjeskiye,bool& povtor,int& svoi) {
+	int svoi_shashki    = (hod) ? 1:2 ;
+	int chuzhie_shashki = (hod) ? 2:1 ;
+	
+		for (int i = 1; i <= stepperX; i++) {
+			if (arrHod[i] == 0) {pustay_kletka_count++;
+			}
+			else {
+				if ((arrHod[i] == chuzhie_shashki) || (arrHod[i] == chuzhie_shashki+2)) {
+					vrazjeskiye++;
+					if ((arrHod[i + 1] != 0) && i < stepperX - 1) { povtor = true; }
+					if (i == stepperX) {
+						if ((arrHod[i] == 2 || arrHod[i] == 4)) { povtor = true; }
+					}
+					else {
+						if ((arrHod[i + 1] != 0) && i < 8) { povtor = true; }
+					}
+				}
+				if ((arrHod[i] == svoi_shashki) || (arrHod[i] == svoi_shashki +2)) {
+					svoi++;
+					if ((arrHod[i + 1] != 0) && i < stepperX - 1) { povtor = true; }
+					if (i == stepperX) {
+						if ((arrHod[i] == 2 || arrHod[i] == 4)) { povtor = true; }
+					}
+					else {
+						if ((arrHod[i + 1] != 0) && i < 8) { povtor = true; }
+					}
+				}
+			}
+		}
 }
