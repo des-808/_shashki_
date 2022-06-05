@@ -415,7 +415,7 @@ void proverka_hoda_obichnyh_shashek(bool hod,int shashki[], short tmpY, short tm
 	int mesto = tmpY * 8 + tmpX;
 	cout << mesto << endl;
 	cout <<  *&shashki[mesto]  << endl;
-	tmpY;
+	tmpY; 
 
 	/*if (((shashki[tmpY +  1][tmpX +  1] == shashki) || (shashki[tmpY +  1][tmpX +  1] == shashki + 2 )) && (shashki[tmpY +  2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
 	if (((shashki[tmpY + -1][tmpX +  1] == shashki) || (shashki[tmpY + -1][tmpX +  1] == shashki + 2 )) && (shashki[tmpY + -2][tmpX +  2] == 0)) { smena_hoda = false; cout << "доступен ещё ход можно бить чёрную шашку"; }
